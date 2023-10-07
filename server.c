@@ -6,53 +6,74 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#define PORT 8084
+
+// A function to display an error and stop the program
+void error(const char *errorMessage)
+{
+    perror(errorMessage);
+    exit(1);
+}
 
 int main()
 {
 
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address;
+    // Declaring Socket File Descriptors (Pre and Post Connection)
+    int sockFdPreConn, sockFdPostConn;
 
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = {0};
-    char *hello = "Hello from server";
+    // awamiErrorCode to store error codes for any function we run so that we can show an error if needed
+    int awamiErrorCode;
 
-    // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    // Setting the port to run the process on..
+    int port = 5055;
+
+    // Declaring buffer of size 1024, needed for sending messages
+    char buffer[1024];
+
+    // Declaring object to carry addresses for server and client
+    struct sockaddr_in serverAddress, clientAddress;
+
+    // A variable to store the length of the address of the client we will connect to
+    socklen_t clientLength;
+
+    // Initiliazing socket before connection
+    sockFdPreConn = socket(AF_INET, SOCK_STREAM, 0);
+
+    // Checking if initialization returned with any errors...
+    if (sockFdPreConn < 0)
     {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
+        error("[!] Error while Pre connection socket initialization.");
     }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    // Cleaning/Emptying the server address variable before use
+    bzero((char *)&serverAddress, sizeof(serverAddress));
 
-    // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr *)&address,
-             sizeof(address)) < 0)
+    // Initializing the server address
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(port); // Setting port from int to required datatype before setting it
+
+    // Binding the address to the preConnection socket and checking if it goes wrong
+    if (bind(sockFdPreConn, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
     {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
+        error("[!] Error while binding.");
     }
 
-    if (listen(server_fd, 3) < 0)
+    // Listen for connections
+    listen(sockFdPreConn, 1);
+
+    // Initializing clientLength
+    clientLength = sizeof(clientAddress);
+
+    // Initializing post-connection socket once the connection is made by the client
+    sockFdPostConn = accept(sockFdPreConn, (struct sockaddr *)&clientAddress, &clientLength);
+
+    // Checking if the initialization was successful
+    if (sockFdPostConn < 0)
     {
-        perror("listen");
-        exit(EXIT_FAILURE);
+        error("[!] Error while accepting connection.");
     }
 
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                             (socklen_t *)&addrlen)) < 0)
-    {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-
-    close(new_socket);
-    shutdown(server_fd, SHUT_RDWR);
+    printf("[+] Connection made successfully with %s.", inet_ntoa(clientAddress.sin_addr));
 
     return 0;
 }
