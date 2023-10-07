@@ -17,6 +17,7 @@ void error(const char *errorMessage)
 int main(int argc, char const *argv[])
 {
 
+    printf("\n[+] Preparing to connect to backdoor.");
     // Initializing socket file descriptor and the awaami error code
     int sockFd, awaamiErrorCode;
 
@@ -55,7 +56,7 @@ int main(int argc, char const *argv[])
         error("\n[!] Error while trying to connect");
     }
 
-    printf("[+] Successfully Connected.\n");
+    printf("\n[+] Successfully Connected.\n");
 
     close(sockFd);
     return 0;
