@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 // A function to display an error and stop the program
 void error(const char *errorMessage)
@@ -14,8 +15,14 @@ void error(const char *errorMessage)
     exit(1);
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
+
+    printf("=========================================================");
+    printf("\n               WELCOME TO FILE EATER");
+    printf("\n=========================================================");
+
+    printf("\n\n[+] Preparing for connections...");
 
     // Declaring Socket File Descriptors (Pre and Post Connection)
     int sockFdPreConn, sockFdPostConn;
@@ -24,7 +31,7 @@ int main()
     int awamiErrorCode;
 
     // Setting the port to run the process on..
-    int port = 5055;
+    int port = 4053;
 
     // Declaring buffer of size 1024, needed for sending messages
     char buffer[1024];
@@ -37,11 +44,16 @@ int main()
 
     // Initiliazing socket before connection
     sockFdPreConn = socket(AF_INET, SOCK_STREAM, 0);
+    int optval = 1;
+    if (setsockopt(sockFdPreConn, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+    {
+        error("\n[!] Error while setting sock option.");
+    }
 
     // Checking if initialization returned with any errors...
     if (sockFdPreConn < 0)
     {
-        error("[!] Error while Pre connection socket initialization.");
+        error("\n[!] Error while Pre connection socket initialization.");
     }
 
     // Cleaning/Emptying the server address variable before use
@@ -55,14 +67,18 @@ int main()
     // Binding the address to the preConnection socket and checking if it goes wrong
     if (bind(sockFdPreConn, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
     {
-        error("[!] Error while binding.");
+        error("\n[!] Error while binding.");
     }
 
+    printf("\n[+] Done preparing.");
+
     // Listen for connections
-    listen(sockFdPreConn, 1);
+    printf("\n\n[+] Listening for connections...");
+    listen(sockFdPreConn, 5);
 
     // Initializing clientLength
     clientLength = sizeof(clientAddress);
+    sleep(1);
 
     // Initializing post-connection socket once the connection is made by the client
     sockFdPostConn = accept(sockFdPreConn, (struct sockaddr *)&clientAddress, &clientLength);
@@ -70,10 +86,15 @@ int main()
     // Checking if the initialization was successful
     if (sockFdPostConn < 0)
     {
-        error("[!] Error while accepting connection.");
+        error("\n[!] Error while accepting connection.");
     }
 
-    printf("[+] Connection made successfully with %s.", inet_ntoa(clientAddress.sin_addr));
+    printf("\n[+] Connected successfully.");
 
+    // Closing both sockets
+    close(sockFdPostConn);
+    close(sockFdPreConn);
+
+    printf("\n");
     return 0;
 }
