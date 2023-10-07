@@ -13,6 +13,7 @@ int main()
 
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
+
     int opt = 1;
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
@@ -50,20 +51,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < 10; i++)
-    {
-        char message[10];
-
-        message[0] = '0' + i;
-        message[2] = '\n';
-
-        send(new_socket, message, strlen(message), 0);
-    }
-    printf("Hello message sent\n");
-
-    // closing the connected socket
     close(new_socket);
-    // closing the listening socket
     shutdown(server_fd, SHUT_RDWR);
 
     return 0;
