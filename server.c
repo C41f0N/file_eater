@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 // A function to display an error and stop the program
 void error(const char *errorMessage)
@@ -16,13 +17,16 @@ void error(const char *errorMessage)
 }
 
 int main(int argc, char const *argv[])
+
 {
 
-    printf("=========================================================");
-    printf("\n               WELCOME TO FILE EATER");
-    printf("\n=========================================================");
+    sigaction(SIGPIPE, &(struct sigaction){SIG_IGN}, NULL);
 
-    printf("\n\n[+] Preparing for connections...");
+    fprintf(stderr, "=========================================================");
+    fprintf(stderr, "\n               WELCOME TO FILE EATER");
+    fprintf(stderr, "\n=========================================================");
+
+    fprintf(stderr, "\n\n[+] Preparing for connections...");
 
     // Declaring Socket File Descriptors (Pre and Post Connection)
     int sockFdPreConn, sockFdPostConn;
@@ -44,6 +48,7 @@ int main(int argc, char const *argv[])
 
     // Initiliazing socket before connection
     sockFdPreConn = socket(AF_INET, SOCK_STREAM, 0);
+
     int optval = 1;
     if (setsockopt(sockFdPreConn, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
     {
@@ -70,15 +75,15 @@ int main(int argc, char const *argv[])
         error("\n[!] Error while binding.");
     }
 
-    printf("\n[+] Done preparing.");
+    fprintf(stderr, "\n[+] Done preparing.");
 
     // Listen for connections
-    printf("\n\n[+] Listening for connections...");
+    fprintf(stderr, "\n\n[+] Listening for connections...");
+
     listen(sockFdPreConn, 5);
 
     // Initializing clientLength
     clientLength = sizeof(clientAddress);
-    sleep(1);
 
     // Initializing post-connection socket once the connection is made by the client
     sockFdPostConn = accept(sockFdPreConn, (struct sockaddr *)&clientAddress, &clientLength);
@@ -89,12 +94,31 @@ int main(int argc, char const *argv[])
         error("\n[!] Error while accepting connection.");
     }
 
-    printf("\n[+] Connected successfully.");
+    fprintf(stderr, "\n[+] Connected successfully.");
+
+    // Read data continously
+    awamiErrorCode = 0;
+
+    while (awamiErrorCode >= 0)
+    {
+        // reading data
+        read(sockFdPostConn, buffer, sizeof(buffer));
+        fprintf(stderr, "\n Message recieved: %s", buffer);
+
+        // Checking for disconnection...
+        if (write(sockFdPostConn, buffer, sizeof(buffer)) < 0)
+        {
+            break;
+        }
+    }
+
+    fprintf(stderr, "\n\n[+] The client disconnected.");
 
     // Closing both sockets
     close(sockFdPostConn);
     close(sockFdPreConn);
 
-    printf("\n");
+    fprintf(stderr, "\n[+] The connection was closed.");
+    fprintf(stderr, "\n");
     return 0;
 }
