@@ -1,7 +1,3 @@
-/*
-	Initialise Winsock
-*/
-
 #include<stdio.h>
 #include<winsock2.h>
 #include<string.h>
@@ -10,13 +6,17 @@
 
 int main(int argc , char *argv[])
 {
+
+	// Declaring needed variables
+
 	WSADATA wsa;
 	SOCKET s, new_socket;
 	struct sockaddr_in server, client;
     int c, recv_size;
     char buffer[2048];
 
-		// Repetitive code declared as functions here...
+
+	// Repetitive code declared as functions here...
 
 	void error() {
 		exit(1);
@@ -91,7 +91,6 @@ int main(int argc , char *argv[])
 	}
 
 
-
 	// Main Code
 
 	initWinSock();
@@ -101,17 +100,18 @@ int main(int argc , char *argv[])
 
 	for (int i = 0; i < 10; i++){
 		strcpy(buffer, "This is a message.");
-		printf("\n[SENDING]: %s", buffer);
+		fprintf(stderr, "\n[SENDING]: %s", buffer);
 		reliableSend();
 		Sleep(100);
-}
+	}
+	
+	fprintf(sterr, "Waiting...")
+	Sleep(1000);
 
 	
-
-	// NOT CLOSING PROPERLY ON PURPOSE
-	
-	// closesocket(s);
-	// closesocket(new_socket);
+	// Closing connections
+	closesocket(s);
+	closesocket(new_socket);
 
 	return 0;
 }
