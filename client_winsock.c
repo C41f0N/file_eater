@@ -67,8 +67,6 @@ int main(int argc , char *argv[])
 			return 0;
 		}
 
-		fprintf(stderr, "%d", recv_size);
-
 		buffer[recv_size] = '\0';
 		return 1;
 	}
