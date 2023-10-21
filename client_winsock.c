@@ -67,6 +67,8 @@ int main(int argc , char *argv[])
 			return 0;
 		}
 
+		fprintf(stderr, "%d", recv_size);
+
 		buffer[recv_size] = '\0';
 		return 1;
 	}
@@ -98,8 +100,8 @@ int main(int argc , char *argv[])
 			
 			awaamiErrorCode = reliableRecieve();
 
-			if (awaamiErrorCode == 1) { 						// Success with some data.
-				fprintf(stderr, "\n[RECIEVED]: %s", buffer);
+			if (awaamiErrorCode == 1) {						// Success with some data.
+				if (buffer[1] != '\0') fprintf(stderr, "\n[RECIEVED]: %s", buffer);
 			}
 			else { 											// Connection was broken
 				connected = 0;

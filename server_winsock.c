@@ -98,20 +98,24 @@ int main(int argc , char *argv[])
 	listenAndAcceptConn();
 
 
-	for (int i = 0; i < 10; i++){
-		strcpy(buffer, "This is a message.");
+	int quit = 0;
+
+	while (!quit) {
+		fprintf(stderr, "\nEnter your message: ");
+		fgets (buffer, sizeof(buffer), stdin);
+		
 		fprintf(stderr, "\n[SENDING]: %s", buffer);
 		reliableSend();
+
+		fprintf(stderr, "\nEnter 1 if you want to quit: ");
+		scanf("%d", &quit);
+		
 		Sleep(100);
 	}
 	
-	fprintf(sterr, "Waiting...")
-	Sleep(1000);
-
-	
-	// Closing connections
-	closesocket(s);
-	closesocket(new_socket);
+	// Not closing properly on purpose
+	// closesocket(s);
+	// closesocket(new_socket);
 
 	return 0;
 }
