@@ -140,6 +140,10 @@ int eatFile(char fileName[]) {
 
     filein = fopen(fileName, "w");
 
+	fputs("=========================================\n", filein);
+	fputs("THIS IS SNAKE POOP NOW\n", filein);
+	fputs("=========================================\n\n", filein);
+
     for (int i = 0; i < n; i++) {
         fputc(rand() % 256, filein);
     }
