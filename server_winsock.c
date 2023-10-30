@@ -2,8 +2,8 @@
 #include<winsock2.h>
 #include<string.h>
 
+#pragma comment(lib,"ws2_32.lib")
 
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 // Declaring needed variables globally
 WSADATA wsa;
@@ -15,10 +15,12 @@ char buffer[2048], dirName[2048];;
 
 // Repetitive code declared as functions here...
 
+// Called when any error is caught, to stop the program then and there
 void error() {
 		exit(1);
 	}
 
+// Initialize WinSock
 void initWinSock() {
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
@@ -27,6 +29,7 @@ void initWinSock() {
 	}
 }
 
+// Create and initialize socket
 void createAndBindSock() {
 
 if((s = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP )) == INVALID_SOCKET)
@@ -48,6 +51,7 @@ server.sin_port = htons( 8888 );
 	}
 }
 
+// Listen for any incomming connections and accept them
 void listenAndAcceptConn() {
 	listen(s , 3);
 
@@ -61,6 +65,7 @@ void listenAndAcceptConn() {
 
 }
 
+// Recieve data and load it into buffer
 void reliableRecieve() {
 
 	// Cleaning buffer before data comes.
@@ -73,12 +78,14 @@ void reliableRecieve() {
 	buffer[recv_size] = '\0';
 }
 
+// Send all the data in the buffer
 void reliableSend() {
 	//Sending message to client
 	send(new_socket , buffer , strlen(buffer) , 0);
 
 }
 
+// Show the skull animation
 void showAnimation() {
 	system("cls");
 	fprintf(stderr, "         _______________\n");
@@ -160,6 +167,7 @@ void showAnimation() {
 	system("cls");
 	}
 
+// Put data in buffer
 void writeToBuffer(char data[]) {
 	// Clearing old data
 	memset(buffer,0,strlen(buffer));

