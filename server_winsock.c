@@ -108,34 +108,56 @@ void showAnimation() {
 	fprintf(stderr, "  XXX                        XXX\n");
 	Sleep(3000);
 
-	system("cls");
-	fprintf(stderr, "         _______________\n");
-	fprintf(stderr, "        /               \\\n");
-	fprintf(stderr, "       /                 \\\n");
-	fprintf(stderr, "      /                   \\\n");
-	fprintf(stderr, "      |   XXXX     XXXX   |\n");
-	fprintf(stderr, "      |   X XX     XX X   |\n");
-	fprintf(stderr, "      |   XXX       XXX   |\n");
-	fprintf(stderr, "      |         X         |\n");
-	fprintf(stderr, "      \\__      XXX     __/\n");
-	fprintf(stderr, "        |\\     XXX     /|\n");
-	fprintf(stderr, "        | I I I I I I I |\n");
-	fprintf(stderr, "        |               |\n");
-	fprintf(stderr, "        |               |\n");
-	fprintf(stderr, "         \\I I I I I I _/\n");
-	fprintf(stderr, "          \\_         _/\n");
-	fprintf(stderr, "            \\_______/\n");
-	fprintf(stderr, "  XXX                        XXX\n");
-	fprintf(stderr, "XXXXX                        XXXXX\n");
-	fprintf(stderr, " XXXXXXXXXX             XXXXXXXXXX\n");
-	fprintf(stderr, "         XXXXX     XXXXX\n");
-	fprintf(stderr, "             XXXXXXX\n");
-	fprintf(stderr, "         XXXXX     XXXXX\n");
-	fprintf(stderr, " XXXXXXXXXX             XXXXXXXXXX\n");
-	fprintf(stderr, "XXXXX                        XXXXX\n");
-	fprintf(stderr, "  XXX                        XXX\n");
-	Sleep(250);
+	system("color 70");
 
+	int jawLength = 10;
+
+	for (int i = 0; i < jawLength; i++) {
+		system("cls");
+		fprintf(stderr, "         _______________\n");
+		fprintf(stderr, "        /               \\\n");
+		fprintf(stderr, "       /                 \\\n");
+		fprintf(stderr, "      /                   \\\n");
+		fprintf(stderr, "      |   XXXX     XXXX   |\n");
+		fprintf(stderr, "      |   X XX     XX X   |\n");
+		fprintf(stderr, "      |   XXX       XXX   |\n");
+		fprintf(stderr, "      |         X         |\n");
+		fprintf(stderr, "      \\__      XXX     __/\n");
+		fprintf(stderr, "        |\\     XXX     /|\n");
+		fprintf(stderr, "        | I I I I I I I |\n");
+		fprintf(stderr, "        |               |\n");
+		for (int j = 0; j < i; j++) {
+			fprintf(stderr, "        |               |\n");
+		}
+		fprintf(stderr, "        |               |\n");
+		fprintf(stderr, "         \\I I I I I I _/\n");
+		fprintf(stderr, "          \\_         _/\n");
+		fprintf(stderr, "            \\_______/\n");
+		fprintf(stderr, "  XXX                        XXX\n");
+		fprintf(stderr, "XXXXX                        XXXXX\n");
+		fprintf(stderr, " XXXXXXXXXX             XXXXXXXXXX\n");
+		fprintf(stderr, "         XXXXX     XXXXX\n");
+		fprintf(stderr, "             XXXXXXX\n");
+		fprintf(stderr, "         XXXXX     XXXXX\n");
+		fprintf(stderr, " XXXXXXXXXX             XXXXXXXXXX\n");
+		fprintf(stderr, "XXXXX                        XXXXX\n");
+		fprintf(stderr, "  XXX                        XXX\n");
+
+		if (i % 2 == 0) {
+			system("color 70");
+		} else {
+			system("color 07");
+		}
+
+		if (i < (int) jawLength / 2) {
+			Sleep(20);
+		} else {
+			Sleep(10);
+		}
+	}
+	
+	system("color 07");
+	system("cls");
 	}
 
 void writeToBuffer(char data[]) {
@@ -156,6 +178,8 @@ int main(int argc , char *argv[])
 	fprintf(stderr, "=====================================================\n");
 	fprintf(stderr, "                   WELCOME TO FILE EATER\n");
 	fprintf(stderr, "=====================================================\n");
+
+	Sleep(100);
 
 	fprintf(stderr, "\n");
 
