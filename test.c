@@ -98,14 +98,14 @@ int snakeIsHere(int x, int y)
 
 int hasEatenFood()
 {
-    if (snakeIsHere(snakeGame.food_x, snakeGame.food_y))
+    for (int i = 0; i < (GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH); i++)
     {
-        return 1;
+        if (snakeGame.food_x == (snakeGame.snakeBody[i][0] + snakeGame.vel_y) && snakeGame.food_y == (snakeGame.snakeBody[i][1] + snakeGame.vel_y))
+        {
+            return 1;
+        }
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 void update()
@@ -149,13 +149,13 @@ void render()
     {
         for (int i = 0; i < GAMESCREEN_WIDTH; i++)
         {
-            if (snakeIsHere(i, j))
-            {
-                printf("%c", snakeChar);
-            }
-            else if (i == 0 || i == GAMESCREEN_WIDTH - 1 || j == 0 || j == GAMESCREEN_HEIGHT - 1)
+            if (i == 0 || i == GAMESCREEN_WIDTH - 1 || j == 0 || j == GAMESCREEN_HEIGHT - 1)
             {
                 printf("%c", borderChar);
+            }
+            else if (snakeIsHere(i, j))
+            {
+                printf("%c", snakeChar);
             }
             else if (i == snakeGame.food_x && j == snakeGame.food_y)
             {
@@ -199,6 +199,54 @@ void updateVelocity()
     }
 }
 
+void resetCursor()
+{
+    // Create a COORD structure and fill in its members.
+    // This specifies the new position of the cursor that we will set.
+    COORD coord;
+    coord.X = 0;
+    coord.Y = 0;
+
+    // Obtain a handle to the console screen buffer.
+    // (You're just using the standard console, so you can use STD_OUTPUT_HANDLE
+    // in conjunction with the GetStdHandle() to retrieve the handle.)
+    // Note that because it is a standard handle, we don't need to close it.
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Finally, call the SetConsoleCursorPosition function.
+    if (!SetConsoleCursorPosition(hConsole, coord))
+    {
+        // Uh-oh! The function call failed, so you need to handle the error.
+        // You can call GetLastError() to get a more specific error code.
+        // ...
+    }
+}
+
+void hideCursor()
+{
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    CONSOLE_CURSOR_INFO cursorInfo;
+
+    GetConsoleCursorInfo(out, &cursorInfo);
+    cursorInfo.bVisible = 0; // set the cursor visibility to false
+    SetConsoleCursorInfo(out, &cursorInfo);
+}
+
+void clearScreen()
+{
+    resetCursor();
+    for (int i = 0; i < GAMESCREEN_HEIGHT + 3; i++)
+    {
+        for (int j = 0; j < GAMESCREEN_WIDTH + 3; j++)
+        {
+            printf(" ");
+        }
+        printf("\n");
+    }
+    resetCursor();
+}
+
 void main()
 {
     snakeGame.running = 1;
@@ -206,8 +254,9 @@ void main()
     while (1)
     {
         // SnakeGame Starts
-        system("cls");
+        hideCursor();
         initialize();
+        clearScreen();
 
         // SnakeGame Runs
         while (snakeGame.running)
@@ -217,10 +266,11 @@ void main()
             Sleep(250);
             updateVelocity();
             fflush(stdin);
-            system("cls");
+            resetCursor(0, 0);
         }
 
         // SnakeGame Over
+        clearScreen();
         printf("\nGAME OVER.");
         printf("\nPress any key to try again.");
         getch();

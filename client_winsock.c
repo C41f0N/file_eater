@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <string.h>
+#include <conio.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <time.h>
@@ -397,6 +398,19 @@ void initialize()
 	snakeGame.vel_y = 0;
 }
 
+int snakeIsHere(int x, int y)
+{
+	for (int i = 0; i < (GAMESCREEN_WIDTH * GAMESCREEN_HEIGHT); i++)
+	{
+		// check x and y
+		if (x == snakeGame.snakeBody[i][0] && y == snakeGame.snakeBody[i][1])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int checkGameOver()
 {
 	if ((snakeGame.snakeBody[0][0] + snakeGame.vel_x) < (GAMESCREEN_WIDTH - 1) &&
@@ -423,19 +437,6 @@ int checkGameOver()
 void gameOver()
 {
 	snakeGame.running = 0;
-}
-
-int snakeIsHere(int x, int y)
-{
-	for (int i = 0; i < (GAMESCREEN_WIDTH * GAMESCREEN_HEIGHT); i++)
-	{
-		// check x and y
-		if (x == snakeGame.snakeBody[i][0] && y == snakeGame.snakeBody[i][1])
-		{
-			return 1;
-		}
-	}
-	return 0;
 }
 
 int hasEatenFood()
