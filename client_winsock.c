@@ -6,7 +6,7 @@
 #include <time.h>
 #include <pthread.h>
 #define GAMESCREEN_WIDTH 50
-#define GAMESCREEN_HEIGHT 10
+#define GAMESCREEN_HEIGHT 20
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -345,6 +345,7 @@ struct SnakeGame
 	int food_y;
 	int score;
 	int running;
+	int deltaFrame;
 
 	int length;
 	int top;
@@ -375,6 +376,8 @@ void initialize()
 		snakeGame.snakeBody[i][1] = -1;
 	}
 
+	snakeGame.deltaFrame = 250;
+
 	snakeGame.score = 0;
 
 	snakeGame.snakeBody[0][0] = (int)GAMESCREEN_WIDTH / 2;
@@ -401,7 +404,15 @@ int checkGameOver()
 		(snakeGame.snakeBody[0][1] + snakeGame.vel_y) < (GAMESCREEN_HEIGHT - 1) &&
 		(snakeGame.snakeBody[0][1] + snakeGame.vel_y) > 0)
 	{
-		return 0;
+		// check if snake ate itself
+		if (snakeIsHere((snakeGame.snakeBody[0][0] + snakeGame.vel_x), (snakeGame.snakeBody[0][1] + snakeGame.vel_y)))
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 	else
 	{
@@ -441,11 +452,13 @@ int hasEatenFood()
 
 void update()
 {
+	// See if game over
 	if (checkGameOver())
 	{
 		gameOver();
 	}
 
+	// Check if food has been eaten
 	if (hasEatenFood())
 	{
 		snakeGame.length++;
@@ -453,19 +466,22 @@ void update()
 		putFood();
 	}
 
-	// Shift all places to right
+	// Update the deltaFrame
+	snakeGame.deltaFrame = 250 - (((int)snakeGame.score / 5) * 25);
+
+	// Shift all places to right in body array
 	for (int i = (GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH) - 1; i >= 0; i--)
 	{
 		snakeGame.snakeBody[i + 1][0] = snakeGame.snakeBody[i][0];
 		snakeGame.snakeBody[i + 1][1] = snakeGame.snakeBody[i][1];
 	}
 
+	// add snake head
 	snakeGame.snakeBody[0][0] += snakeGame.vel_x;
 	snakeGame.snakeBody[0][1] += snakeGame.vel_y;
-
 	snakeGame.top++;
 
-	// Do a cleanup
+	// Remove extra coordinates
 	while (snakeGame.top + 1 > snakeGame.length)
 	{
 		snakeGame.snakeBody[snakeGame.top][0] = -1;
@@ -530,31 +546,122 @@ void updateVelocity()
 	}
 }
 
+void resetCursor()
+{
+	COORD coord;
+	coord.X = 0;
+	coord.Y = 0;
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	SetConsoleCursorPosition(hConsole, coord);
+}
+
+void hideCursor()
+{
+	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	CONSOLE_CURSOR_INFO cursorInfo;
+
+	GetConsoleCursorInfo(out, &cursorInfo);
+	cursorInfo.bVisible = 0; // set the cursor visibility to false
+	SetConsoleCursorInfo(out, &cursorInfo);
+}
+
+void clearScreen()
+{
+	resetCursor();
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 200; j++)
+		{
+			fprintf(stderr, " ");
+		}
+		fprintf(stderr, "\n");
+	}
+	resetCursor();
+}
+
+void showSnakeWelcomeScreen()
+{
+
+	fprintf(stderr, "   _____                         __   \n");
+	fprintf(stderr, "  /  _  \\    ____   ____   _____/  |_ \n");
+	fprintf(stderr, " /  /_\\  \\  / ___\\_/ __ \\ /    \\   __\\\n");
+	fprintf(stderr, "/    |    \\/ /_/  >  ___/|   |  \\  |  \n");
+	fprintf(stderr, "\\____|__  /\\___  / \\___  >___|  /__|  \n");
+	fprintf(stderr, "        \\/_____/      \\/     \\/      \n");
+	fprintf(stderr, "  _________              __           \n");
+	fprintf(stderr, " /   _____/ ____ _____  |  | __ ____  \n");
+	fprintf(stderr, " \\_____  \\ /    \\__  \\ |  |/ // __ \\ \n");
+	fprintf(stderr, " /        \\   |  \\/ __ \\|    <\\  ___/ \n");
+	fprintf(stderr, "/_______  /___|  (____  /__|_ \\___  >\n");
+	fprintf(stderr, "        \\/     \\/     \\/     \\/    \\/ \n");
+
+	fprintf(stderr, "\n\n");
+	fprintf(stderr, "  A NORMAL   ____\n");
+	fprintf(stderr, "  SNAKE     / . .\\      BY\n");
+	fprintf(stderr, "  GAME      \\  ---<   SARIM,\n");
+	fprintf(stderr, "             \\  /    MUNTAHA\n");
+	fprintf(stderr, "   __________/ /       AND\n");
+	fprintf(stderr, "-=:___________/	       SHAHEER\n");
+
+	fprintf(stderr, "\n\nPress any key to continue...\n");
+
+	fflush(stdin);
+	getch();
+}
+
+void showGameOverScreen()
+{
+	fprintf(stderr, "  ________    _____      _____  ___________\n");
+	fprintf(stderr, " /  _____/   /  _  \\    /     \\ \\_   _____/\n");
+	fprintf(stderr, "/   \\  ___  /  /_\\  \\  /  \\ /  \\ |    __)_ \n");
+	fprintf(stderr, "\\    \\_\\  \\/    |    \\/    Y    \\|        \\\n");
+	fprintf(stderr, " \\______  /\\____|__  /\\____|__  /_______  /\n");
+	fprintf(stderr, "        \\/         \\/         \\/        \\/ \n");
+	fprintf(stderr, "____________   _________________________   \n");
+	fprintf(stderr, "\\_____  \\   \\ /   /\\_   _____/\\______   \\  \n");
+	fprintf(stderr, " /   |   \\   Y   /  |    __)_  |       _/  \n");
+	fprintf(stderr, "/    |    \\     /   |        \\ |    |   \\  \n");
+	fprintf(stderr, "\\_______  /\\___/   /_______  / |____|_  /  \n");
+	fprintf(stderr, "        \\/                 \\/         \\/   \n");
+
+	fprintf(stderr, "\n\nSCORE: %d", snakeGame.score);
+
+	printf("\n\nPress any key to try again...");
+	fflush(stdin);
+	getch();
+}
+
 int snakeGameMain()
 {
+
+	hideCursor();
 	snakeGame.running = 1;
+
+	clearScreen();
+	showSnakeWelcomeScreen();
 
 	while (1)
 	{
 		// SnakeGame Starts
-		system("cls");
 		initialize();
+		clearScreen();
 
 		// SnakeGame Runs
 		while (snakeGame.running)
 		{
 			update();
 			render();
-			Sleep(250);
+			Sleep(snakeGame.deltaFrame);
 			updateVelocity();
 			fflush(stdin);
-			system("cls");
+			resetCursor(0, 0);
 		}
 
 		// SnakeGame Over
-		printf("\nGAME OVER.");
-		printf("\nPress any key to try again.");
-		getch();
+		clearScreen();
+		showGameOverScreen();
 		snakeGame.running = 1;
 		fflush(stdin);
 	}

