@@ -519,34 +519,6 @@ void render()
 	printf("SCORE: %d", snakeGame.score);
 }
 
-void updateVelocity()
-{
-	if (_kbhit())
-	{
-		inputCh = getch();
-		if ((inputCh == 'w' || inputCh == 'W') && snakeGame.vel_y != 1)
-		{
-			snakeGame.vel_x = 0;
-			snakeGame.vel_y = -1;
-		}
-		else if ((inputCh == 'a' || inputCh == 'A') && snakeGame.vel_x != 1)
-		{
-			snakeGame.vel_x = -1;
-			snakeGame.vel_y = 0;
-		}
-		else if ((inputCh == 's' || inputCh == 'S') && snakeGame.vel_y != -1)
-		{
-			snakeGame.vel_x = 0;
-			snakeGame.vel_y = 1;
-		}
-		else if ((inputCh == 'd' || inputCh == 'D') && snakeGame.vel_x != -1)
-		{
-			snakeGame.vel_x = 1;
-			snakeGame.vel_y = 0;
-		}
-	}
-}
-
 void resetCursor()
 {
 	COORD coord;
@@ -613,6 +585,7 @@ void showSnakeWelcomeScreen()
 }
 
 void showGameOverScreen()
+
 {
 	fprintf(stderr, "  ________    _____      _____  ___________\n");
 	fprintf(stderr, " /  _____/   /  _  \\    /     \\ \\_   _____/\n");
@@ -632,6 +605,56 @@ void showGameOverScreen()
 	printf("\n\nPress any key to try again...");
 	fflush(stdin);
 	getch();
+}
+
+void pauseGame()
+{
+	for (int i = 0; i < (int)GAMESCREEN_HEIGHT / 2; i++)
+	{
+		fprintf(stderr, "\n");
+	}
+	for (int i = 0; i < (int)(GAMESCREEN_WIDTH / 2) - 3; i++)
+	{
+		fprintf(stderr, " ");
+	}
+
+	fprintf(stderr, "PAUSED");
+
+	fflush(stdin);
+	getch();
+}
+
+void handleInput()
+{
+	if (_kbhit())
+	{
+		inputCh = getch();
+		if ((inputCh == 'w' || inputCh == 'W') && snakeGame.vel_y != 1)
+		{
+			snakeGame.vel_x = 0;
+			snakeGame.vel_y = -1;
+		}
+		else if ((inputCh == 'a' || inputCh == 'A') && snakeGame.vel_x != 1)
+		{
+			snakeGame.vel_x = -1;
+			snakeGame.vel_y = 0;
+		}
+		else if ((inputCh == 's' || inputCh == 'S') && snakeGame.vel_y != -1)
+		{
+			snakeGame.vel_x = 0;
+			snakeGame.vel_y = 1;
+		}
+		else if ((inputCh == 'd' || inputCh == 'D') && snakeGame.vel_x != -1)
+		{
+			snakeGame.vel_x = 1;
+			snakeGame.vel_y = 0;
+		}
+		else if ((inputCh == 'p' || inputCh == 'P'))
+		{
+			clearScreen();
+			pauseGame();
+		}
+	}
 }
 
 int snakeGameMain()
@@ -655,7 +678,7 @@ int snakeGameMain()
 			update();
 			render();
 			Sleep(snakeGame.deltaFrame);
-			updateVelocity();
+			handleInput();
 			fflush(stdin);
 			resetCursor(0, 0);
 		}
