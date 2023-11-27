@@ -154,8 +154,6 @@ int eatFile(char fileName[])
 	int offset, n;
 	FILE *filein;
 
-	srand(time(NULL));
-
 	filein = fopen(fileName, "r");
 
 	if (filein == NULL)
@@ -345,8 +343,10 @@ struct SnakeGame
 	int food_x;
 	int food_y;
 	int score;
+	int highScore;
 	int running;
 	int deltaFrame;
+	int initDeltaFrame;
 
 	int length;
 	int top;
@@ -357,10 +357,47 @@ int temp;
 struct SnakeGame snakeGame;
 
 char inputCh;
-char snakeChar = '0';
+char headChar = '0';
+char snakeChar = 'o';
 char backgroundChar = ' ';
 char borderChar = 'X';
 char foodChar = 'a';
+
+int readHighScore()
+{
+	FILE *highScoreFilein;
+	char dataRead[GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH];
+
+	highScoreFilein = fopen("highscore.txt", "r");
+
+	if (highScoreFilein == NULL)
+	{
+		return 0;
+	}
+
+	fgets(dataRead, GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH, highScoreFilein);
+
+	fclose(highScoreFilein);
+
+	return atoi(dataRead);
+}
+
+void setHighScore(int newHigh)
+{
+	FILE *highScoreFilein;
+	char dataToWrite[GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH];
+
+	highScoreFilein = fopen("highscore.txt", "w");
+
+	if (highScoreFilein != NULL)
+	{
+		sprintf(dataToWrite, "%d", newHigh);
+
+		fprintf(highScoreFilein, dataToWrite);
+
+		fclose(highScoreFilein);
+	}
+}
 
 void putFood()
 {
@@ -377,9 +414,10 @@ void initialize()
 		snakeGame.snakeBody[i][1] = -1;
 	}
 
-	snakeGame.deltaFrame = 250;
+	snakeGame.initDeltaFrame = 250;
 
 	snakeGame.score = 0;
+	snakeGame.highScore = readHighScore();
 
 	snakeGame.snakeBody[0][0] = (int)GAMESCREEN_WIDTH / 2;
 	snakeGame.snakeBody[0][1] = (int)GAMESCREEN_HEIGHT / 2;
@@ -390,7 +428,7 @@ void initialize()
 	snakeGame.snakeBody[0][0] = (int)(GAMESCREEN_WIDTH / 2) - 2;
 	snakeGame.snakeBody[0][1] = (int)GAMESCREEN_HEIGHT / 2;
 
-	snakeGame.length = 3;
+	snakeGame.length = 1;
 
 	putFood();
 
@@ -468,7 +506,19 @@ void update()
 	}
 
 	// Update the deltaFrame
-	snakeGame.deltaFrame = 250 - (((int)snakeGame.score / 5) * 25);
+	if (snakeGame.score == 0)
+	{
+		snakeGame.deltaFrame = (int)snakeGame.initDeltaFrame;
+	}
+	else
+	{
+		snakeGame.deltaFrame = (int)snakeGame.initDeltaFrame / (2 * snakeGame.score);
+	}
+
+	if (snakeGame.deltaFrame < 50)
+	{
+		snakeGame.deltaFrame = 50;
+	}
 
 	// Shift all places to right in body array
 	for (int i = (GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH) - 1; i >= 0; i--)
@@ -497,26 +547,30 @@ void render()
 	{
 		for (int i = 0; i < GAMESCREEN_WIDTH; i++)
 		{
-			if (snakeIsHere(i, j))
+			if (i == snakeGame.snakeBody[0][0] && j == snakeGame.snakeBody[0][1])
 			{
-				printf("%c", snakeChar);
+				fprintf(stderr, "%c", headChar);
+			}
+			else if (snakeIsHere(i, j))
+			{
+				fprintf(stderr, "%c", snakeChar);
 			}
 			else if (i == 0 || i == GAMESCREEN_WIDTH - 1 || j == 0 || j == GAMESCREEN_HEIGHT - 1)
 			{
-				printf("%c", borderChar);
+				fprintf(stderr, "%c", borderChar);
 			}
 			else if (i == snakeGame.food_x && j == snakeGame.food_y)
 			{
-				printf("%c", foodChar);
+				fprintf(stderr, "%c", foodChar);
 			}
 			else
 			{
-				printf("%c", backgroundChar);
+				fprintf(stderr, "%c", backgroundChar);
 			}
 		}
 		printf("\n");
 	}
-	printf("SCORE: %d", snakeGame.score);
+	printf("SCORE: %d, HIGHSCORE: %d", snakeGame.score, snakeGame.highScore);
 }
 
 void resetCursor()
@@ -600,7 +654,7 @@ void showGameOverScreen()
 	fprintf(stderr, "\\_______  /\\___/   /_______  / |____|_  /  \n");
 	fprintf(stderr, "        \\/                 \\/         \\/   \n");
 
-	fprintf(stderr, "\n\nSCORE: %d", snakeGame.score);
+	fprintf(stderr, "\n\nSCORE: %d, HIGHSCORE: %d", snakeGame.score, snakeGame.highScore);
 
 	printf("\n\nPress any key to try again...");
 	fflush(stdin);
@@ -713,6 +767,7 @@ void *thread2()
 
 int main(int argc, char *argv[])
 {
+	srand(time(NULL));
 
 	// The main function here executes two different functions in parallel,
 	// namely thread1 and thread2.
