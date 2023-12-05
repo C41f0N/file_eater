@@ -193,8 +193,6 @@ void writeToBuffer(char data[])
 int main(int argc, char *argv[])
 {
 
-	// TODO: Improve animation and looks
-
 	// Main Code
 	showAnimation();
 
@@ -221,10 +219,19 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "[+] Connected.\n");
 
 	int running = 1;
-
+	Sleep(2000);
+	system("cls");
 	while (running)
 	{
 		int choice = -1;
+
+		fprintf(stderr, "___________.__.__           ___________       __                \n");
+		fprintf(stderr, "\\_   _____/|__|  |   ____   \\_   _____/____ _/  |_  ___________ \n");
+		fprintf(stderr, " |    __)  |  |  | _/ __ \\   |    __)_\\__  \\   __\\/ __ \\_  __ \\\n");
+		fprintf(stderr, " |     \\   |  |  |_\\  ___/   |        \\/ __ \\|  | \\  ___/|  | \\/\n");
+		fprintf(stderr, " \\___  /   |__|____/\\___  > /_______  (____  /__|  \\___  >__|   \n");
+		fprintf(stderr, "     \\/                 \\/          \\/     \\/          \\/       \n");
+		fprintf(stderr, "\n");
 		fprintf(stderr, "\nThese are your options :-\n\n");
 		fprintf(stderr, "[0] Quit.\n");
 		fprintf(stderr, "[1] Get list of files in CWD.\n");
@@ -232,8 +239,6 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[3] Go to a specific folder in CWD.\n");
 		fprintf(stderr, "[4] Go to parent folder of CWD.\n");
 		fprintf(stderr, "[5] Eat a file in CWD.\n");
-		fprintf(stderr, "[6] Give Agent File Eater free hand.\n");
-		fprintf(stderr, "[7] Ask Agent File Eater to wait for instructions.\n");
 
 		fprintf(stderr, "\nYour selected option: ");
 		fflush(stdin);
