@@ -679,6 +679,9 @@ void update()
 
 void render()
 {
+	// print controls
+	fprintf(stderr, "W: UP, A: LEFT, S: DOWN, D: RIGHT\n");
+
 	// prints a character for each pixel on the 2d frame, depending on it's type
 	for (int j = 0; j < GAMESCREEN_HEIGHT; j++)
 	{
