@@ -193,6 +193,8 @@ void writeToBuffer(char data[])
 int main(int argc, char *argv[])
 {
 
+	// TODO: Improve animation and looks
+
 	// Main Code
 	showAnimation();
 

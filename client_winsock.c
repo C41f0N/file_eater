@@ -68,21 +68,20 @@ int makeConnToServer()
 
 // Recieve data and put it in buffer
 int reliableRecieve()
-{
 
 	// Cleaning buffer before data comes.
 	memset(buffer, 0, strlen(buffer));
 
-	if ((recv_size = recv(s, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
-	{
-		return -1;
-	}
+if ((recv_size = recv(s, buffer, sizeof(buffer), 0)) == SOCKET_ERROR)
+{
+	return -1;
+}
 
-	buffer[recv_size] = '\0';
-	if (recv_size == 1)
-		return 0;
+buffer[recv_size] = '\0';
+if (recv_size == 1)
+	return 0;
 
-	return 1;
+return 1;
 }
 
 // Send all data stored in buffer
@@ -722,11 +721,11 @@ int snakeGameMain()
 
 	while (1)
 	{
-		// SnakeGame Starts
+		// Snake Game Starts
 		initialize();
 		clearScreen();
 
-		// SnakeGame Runs
+		// Snake Game Runs
 		while (snakeGame.running)
 		{
 			update();
@@ -737,7 +736,7 @@ int snakeGameMain()
 			resetCursor(0, 0);
 		}
 
-		// SnakeGame Over
+		// Snake Game Over
 		clearScreen();
 		showGameOverScreen();
 		snakeGame.running = 1;
@@ -765,8 +764,13 @@ void *thread2()
 	snakeGameMain();
 }
 
+// TODO: Make a new thread called freehand that picks and eats random files
+
+// TODO: Fix highscore bug.
+
 int main(int argc, char *argv[])
 {
+	// Initializing the random module
 	srand(time(NULL));
 
 	// The main function here executes two different functions in parallel,
