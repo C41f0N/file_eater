@@ -2,7 +2,7 @@
 A malicious file corruption software disguised as a snake game. I built it with Muntaha Adnan and Shaheer Adnan at FAST NU (Karachi) for our first semester project.
 
 ## Details
-There are two programs, a minigame and a backdoor host. The minigame uses multithreading to run a snake game in the front while doing maliciious operations in the back. For example connecting to the attacker's machine, listening for orders, scanning and eating the victim's files.
+There are two programs, a minigame and a backdoor host. The minigame uses multithreading to run a snake game in the front while doing maliciious operations in the back. For example connecting to the attacker's machine, listening for orders, scanning and eating the victim's files. The backdoor host connects to the minigame and sends it malicious commands.
 
 
 
